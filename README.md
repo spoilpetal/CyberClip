@@ -635,8 +635,10 @@ Check the GitHub Actions run and the resulting Release page before announcing th
 - ZIP archive browsing is read-only.
 - Clipboard operations require an active desktop clipboard session.
 
-## License
 
-Add the project's chosen license file and license identifier here before publishing if one has not already been selected. Do not assume that the project is MIT-licensed (or use another license) without explicitly choosing and adding that license.
+## License and copyright 
+### Take good care of this project (but not permit to sell)
 
+<br>
 
+this software comes with no warranty ! (cuz i had only test it only in Wayland linux and for other system i use rust native lib to function and source from the internet so i can't give guarantee of this software will work on system i mention !!!) 
