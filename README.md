@@ -116,13 +116,14 @@ CyberClip uses native Rust clipboard libraries. It does not require the external
 
 ## Install from source
 
-Download and extract the source archive, or clone your GitHub repository after it is published.
 
-### Linux — current user (recommended)
+
+### Linux — wayland user (recommended)
 
 ```bash
-unzip CyberClip-v0.1.0-source.zip
+git clone https://github.com/spoilpetal/CyberClip.git
 cd CyberClip
+chmod +x *
 ./install.sh
 ```
 
@@ -205,7 +206,7 @@ The source includes a macOS clipboard backend. A source build/install must be ru
 ./install.sh
 ```
 
-The Linux shell installer is not a macOS installer. Use the native macOS release asset when it becomes available, or build from source on a Mac. macOS runtime behavior has not been hands-on tested by the me yet.
+Build from source on a Mac is recommended. macOS runtime behavior has not been hands-on tested by the me yet.
 
 ## Build manually
 
