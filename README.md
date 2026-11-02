@@ -123,7 +123,7 @@ CyberClip uses native Rust clipboard libraries. It does not require the external
 ```bash
 git clone https://github.com/spoilpetal/CyberClip.git
 cd CyberClip
-chmod +x *
+chmod +x install.sh
 ./install.sh
 ```
 
