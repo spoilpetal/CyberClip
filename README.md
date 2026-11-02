@@ -4,7 +4,7 @@
 
 CyberClip combines a command-line interface (CLI) with a terminal user interface (TUI). It keeps a local clipboard history, lets you restore saved entries, and works with text, images, files, folders, and mixed file/folder selections.
 
-> **Platform transparency:** CyberClip has been developed and runtime-tested by its maintainer on Linux (Wayland). The Windows and macOS clipboard backends are implemented in the source and are included in the native GitHub Actions build matrix, but the maintainer does not have access to Windows or macOS machines for hands-on testing. Please treat those platforms as **awaiting independent CI and real-device verification**, not as personally tested. BSD is not supported at this time.
+> **Platform transparency:** CyberClip has been developed and runtime-tested on Linux (Wayland). The Windows and macOS clipboard backends are implemented in the source and are included in the native GitHub Actions build matrix, but i don't not have access to Windows or macOS machines for hands-on testing. Please treat those platforms as **awaiting independent CI and real-device verification**, not as personally tested. BSD is not supported at this time.
 
 ## Contents
 
@@ -43,13 +43,13 @@ CyberClip combines a command-line interface (CLI) with a terminal user interface
 
 ## Platform support and testing status
 
-| Platform | Clipboard implementation | Maintainer's hands-on runtime testing |
+| Platform | Clipboard implementation |  hands-on runtime testing |
 |---|---|---|
 | Linux + Wayland | Native Wayland protocol backend (`wl-clipboard-rs`) | **Tested** |
 | Linux + X11 | `clipboard-rs` X11 backend | Implemented; needs independent X11 runtime verification |
-| Windows x86_64 | Native Win32 backend through `clipboard-rs` | Not tested by maintainer; needs Windows CI and real-device verification |
-| macOS Intel | Native macOS pasteboard backend through `clipboard-rs` | Not tested by maintainer; needs macOS CI and real-device verification |
-| macOS Apple Silicon | Native macOS pasteboard backend through `clipboard-rs` | Not tested by maintainer; needs macOS CI and real-device verification |
+| Windows x86_64 | Native Win32 backend through `clipboard-rs` | Not tested by me; needs Windows CI and real-device verification |
+| macOS Intel | Native macOS pasteboard backend through `clipboard-rs` | Not tested by me; needs macOS CI and real-device verification |
+| macOS Apple Silicon | Native macOS pasteboard backend through `clipboard-rs` | Not tested by me; needs macOS CI and real-device verification |
 | FreeBSD / OpenBSD / NetBSD | No supported backend currently enabled | **Not supported** |
 
 The project includes GitHub Actions workflows intended to check and build Linux, Windows, and macOS targets on native runners. A successful cross-platform build confirms compilation for that target; it does **not** prove that every clipboard operation behaves correctly on every desktop, window manager, compositor, or OS version. Reports and testing from Windows and macOS users are welcome.
@@ -165,7 +165,7 @@ The source includes a macOS clipboard backend. A source build/install must be ru
 ./install.sh
 ```
 
-The Linux shell installer is not a macOS installer. Use the native macOS release asset when it becomes available, or build from source on a Mac. macOS runtime behavior has not been hands-on tested by the maintainer yet.
+The Linux shell installer is not a macOS installer. Use the native macOS release asset when it becomes available, or build from source on a Mac. macOS runtime behavior has not been hands-on tested by the me yet.
 
 ## Build manually
 
@@ -538,7 +538,7 @@ Please include:
 - Full error output.
 - Whether the failure occurs in a native terminal session or remote/virtualized session.
 
-Because the maintainer does not currently have Windows/macOS machines, detailed reports and independent testing are especially valuable.
+Because i don't currently have Windows/macOS machines, detailed reports and independent testing are especially valuable.
 
 ## Contributing
 
@@ -547,14 +547,14 @@ Contributions, bug reports, platform testing, documentation improvements, and co
 A useful contribution workflow:
 
 ```bash
-git clone https://github.com/<YOUR-USERNAME>/CyberClip.git
+git clone https://github.com/spoilpetal/CyberClip.git
 cd CyberClip
 cargo check --locked
 cargo test --locked
 cargo build --locked --release
 ```
 
-Replace the repository URL with the actual public repository URL after publication.
+
 
 When opening an issue, include reproducible steps, expected behavior, actual behavior, OS/session details, and relevant logs. Please avoid including private clipboard contents, tokens, passwords, or other sensitive data in issue reports.
 
@@ -586,8 +586,8 @@ Check the GitHub Actions run and the resulting Release page before announcing th
 
 ## Known limitations
 
-- Windows and macOS source backends are implemented but have not been hands-on tested by the maintainer. Independent native CI and real-device validation are still required.
-- Linux X11 is implemented but should receive independent runtime testing in addition to the maintainer's Wayland testing.
+- Windows and macOS source backends are implemented but have not been hands-on tested by the me. Independent native CI and real-device validation are still required.
+- Linux X11 is implemented but should receive independent runtime testing in addition on the  Wayland testing.
 - BSD systems are not supported yet.
 - `paste` prints text only. It is not a binary export command for images or file selections.
 - Restoring file/image history depends on the original source path still existing.
@@ -597,3 +597,5 @@ Check the GitHub Actions run and the resulting Release page before announcing th
 ## License
 
 Add the project's chosen license file and license identifier here before publishing if one has not already been selected. Do not assume that the project is MIT-licensed (or use another license) without explicitly choosing and adding that license.
+
+
