@@ -4,7 +4,7 @@
 
 CyberClip combines a command-line interface (CLI) with a terminal user interface (TUI). It keeps a local clipboard history, lets you restore saved entries, and works with text, images, files, folders, and mixed file/folder selections.
 
-> **Platform transparency:** CyberClip has been developed and runtime-tested on Linux (Wayland). The Windows and macOS clipboard backends are implemented in the source and are included in the native GitHub Actions build matrix, but i don't not have access to Windows or macOS machines for hands-on testing. Please treat those platforms as **awaiting independent CI and real-device verification**, not as personally tested. BSD is not supported at this time.
+> **Platform transparency:** CyberClip is developed and runtime-tested on Linux (Wayland). Linux X11, Windows, and macOS clipboard backends are implemented in the source code. GitHub Actions is configured to build and test the project on supported Linux, Windows, and macOS runners. However, Windows and macOS clipboard behavior has not yet been verified through hands-on testing on physical devices. Linux X11 also needs independent runtime verification. These platforms should therefore be considered implemented but not fully runtime-verified. BSD is not currently supported.**awaiting independent CI and real-device verification**, not as personally tested. BSD is not supported at this time.
 
 ## Contents
 
