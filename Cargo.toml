@@ -1,0 +1,40 @@
+
+[package]
+name = "cyberclip"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4.5", features = ["derive"] }
+
+ratatui = "0.29"
+crossterm = "0.28"
+ratatui-image = { version = "=9.0.0", default-features = false, features = ["image-defaults", "crossterm"] }
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+
+dirs = "6"
+chrono = { version = "0.4", features = ["serde"] }
+
+image = "0.25.6"
+syntect = { version = "5.2", default-features = false, features = ["default-fancy"] }
+
+# Cross-platform disk enumeration and free-space reporting.
+sysinfo = "0.33"
+
+
+# Read-only ZIP archive listing in the TUI.
+zip = { version = "2", default-features = false, features = ["deflate"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+# Native Wayland clipboard protocol access (no wl-copy executable required).
+wl-clipboard-rs = "0.9.4"
+# Native X11 clipboard backend.
+clipboard-rs = "0.3.5"
+
+[target.'cfg(any(target_os = "windows", target_os = "macos"))'.dependencies]
+# Native Win32 clipboard / macOS pasteboard backend.
+clipboard-rs = "0.3.5"
