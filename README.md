@@ -625,6 +625,11 @@ The release workflow is configured for these targets:
 
 Check the GitHub Actions run and the resulting Release page before announcing that a platform asset is available. A configured workflow is not the same thing as a completed, successful build. The source installers currently build from source; the platform release archives are downloaded separately from GitHub Releases.
 
+
+## Good to know ::
+There is a lite version of this CyberClip available here <a href="https://github.com/spoilpetal/CyberClip_lite" target="_new">CyberClip_lite</a> 
+
+
 ## Known limitations
 
 - Windows and macOS source backends are implemented but have not been hands-on tested by the me. Independent native CI and real-device validation are still required.
