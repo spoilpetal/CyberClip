@@ -9,6 +9,7 @@ CyberClip combines a command-line interface (CLI) with a terminal user interface
 ## Contents
 
 - [Features](#features)
+- [Screenshots](#screenshots)
 - [Platform support and testing status](#platform-support-and-testing-status)
 - [Requirements](#requirements)
 - [Install from source](#install-from-source)
@@ -40,6 +41,45 @@ CyberClip combines a command-line interface (CLI) with a terminal user interface
 - **Pinning:** keep important history entries outside the rolling unpinned-history limit.
 - **Per-user installation:** the default installer does not need administrator/root privileges.
 - **Optional system installation:** install commands for all users when you explicitly choose the system installer.
+
+
+
+## Screenshots
+
+Explore CyberClip's terminal interface and features through the screenshots below.
+
+### Clipboard History & Preview
+
+![CyberClip History Preview](https://raw.githubusercontent.com/spoilpetal/Picture_Vault/main/CyberClip_pictures/v0.1.0/history_preview.png)
+
+### Image Preview
+
+![CyberClip Image Preview](https://raw.githubusercontent.com/spoilpetal/Picture_Vault/main/CyberClip_pictures/v0.1.0/image_preview.png)
+
+### Archive Viewer
+
+![CyberClip Archive Viewer](https://raw.githubusercontent.com/spoilpetal/Picture_Vault/main/CyberClip_pictures/v0.1.0/archive_view.png)
+
+### File Information
+
+![CyberClip File Information](https://raw.githubusercontent.com/spoilpetal/Picture_Vault/main/CyberClip_pictures/v0.1.0/file_information.png)
+
+### TUI Storage Information
+
+![CyberClip TUI Storage](https://raw.githubusercontent.com/spoilpetal/Picture_Vault/main/CyberClip_pictures/v0.1.0/tui_storage_view.png)
+
+### CLI Storage Information
+
+![CyberClip CLI Storage](https://raw.githubusercontent.com/spoilpetal/Picture_Vault/main/CyberClip_pictures/v0.1.0/cli_storage_view.png)
+
+### Code Highlighting
+
+![CyberClip Code Highlighting](https://raw.githubusercontent.com/spoilpetal/Picture_Vault/main/CyberClip_pictures/v0.1.0/code_highlight.png)
+
+---
+
+*Screenshots are hosted separately in [Picture_Vault](https://github.com/spoilpetal/Picture_Vault/tree/main/CyberClip_pictures/v0.1.0) to keep the CyberClip source repository lightweight.*
+
 
 ## Platform support and testing status
 
