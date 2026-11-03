@@ -121,7 +121,8 @@ CyberClip uses native Rust clipboard libraries. It does not require the external
 ### Linux — wayland user (recommended)
 
 ```bash
-git clone https://github.com/spoilpetal/CyberClip.git
+# Replace the filename with the package you downloaded.
+tar -xzf cyberclip-VERSION-linux-x86_64.tar.gz
 cd CyberClip
 chmod +x install.sh
 ./install.sh
@@ -213,6 +214,8 @@ Build from source on a Mac is recommended. macOS runtime behavior has not been h
 From the project directory:
 
 ```bash
+git clone https://github.com/spoilpetal/CyberClip.git
+cd CyberClip
 cargo check --locked
 cargo test --locked
 cargo build --locked --release
