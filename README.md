@@ -662,12 +662,6 @@ The repository contains GitHub Actions workflows:
 - `.github/workflows/ci.yml` — checks, tests, and builds on the configured Linux, Windows, and macOS runners.
 - `.github/workflows/release.yml` — builds platform release archives when a version tag is pushed.
 
-To publish a release after pushing the repository:
-
-```bash
-git tag v0.2.0
-git push origin v0.2.0
-```
 
 The release workflow is configured for these targets:
 
@@ -677,7 +671,6 @@ The release workflow is configured for these targets:
 - macOS Intel
 - macOS Apple Silicon
 
-Check the GitHub Actions run and the resulting Release page before announcing that a platform asset is available. A configured workflow is not the same thing as a completed, successful build. The source installers currently build from source; the platform release archives are downloaded separately from GitHub Releases.
 
 ## Good to know
 
