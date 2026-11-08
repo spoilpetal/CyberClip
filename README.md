@@ -4,7 +4,7 @@
 
 CyberClip combines a command-line interface (CLI) with a terminal user interface (TUI). It keeps a local clipboard history, lets you restore saved entries, and works with text, images, files, folders, and mixed file/folder selections.
 
-> **Platform transparency:** CyberClip is developed and runtime-tested on Linux (Wayland). Linux X11, Windows, and macOS clipboard backends are implemented in the source code. GitHub Actions is configured to build and test the project on supported Linux, Windows, and macOS runners. However, Windows and macOS clipboard behavior has not yet been verified through hands-on testing on physical devices. Linux X11 also needs independent runtime verification. These platforms should therefore be considered implemented but not fully runtime-verified. BSD is not currently supported.**awaiting independent CI and real-device verification**, not as personally tested. BSD is not supported at this time.
+> **Platform transparency:** CyberClip is developed and runtime-tested on Linux (Wayland). Linux X11, Windows, and macOS clipboard backends are implemented in the source code. GitHub Actions is configured to build and test the project on supported Linux, Windows, and macOS runners. However, Windows and macOS clipboard behavior has not yet been verified through hands-on testing on physical devices. Linux X11 also needs independent runtime verification. These platforms should therefore be considered implemented but not fully runtime-verified. BSD is not currently supported.
 
 ## Contents
 
@@ -31,8 +31,9 @@ CyberClip combines a command-line interface (CLI) with a terminal user interface
 - **CLI and TUI:** use commands from a shell or manage history in a terminal interface.
 - **Clipboard history:** automatically records supported content copied through CyberClip.
 - **History search and filtering:** filter by text, content type, pinned state, and result limit.
-- **Restore from history:** restore an entry by its displayed history number without searching for the original item again.
+- **Restore from history:** restore an entry by its displayed history number.
 - **Text clipboard:** copy text from the CLI and read the current system clipboard to standard output.
+- **Command capture:** run shell commands and capture the command, stdout, and stderr using `get all`.
 - **Images:** copy supported image files as image clipboard data.
 - **Files and folders:** copy filesystem references, including multiple files and folders in one selection.
 - **File browser:** browse files and folders from the terminal.
@@ -41,8 +42,6 @@ CyberClip combines a command-line interface (CLI) with a terminal user interface
 - **Pinning:** keep important history entries outside the rolling unpinned-history limit.
 - **Per-user installation:** the default installer does not need administrator/root privileges.
 - **Optional system installation:** install commands for all users when you explicitly choose the system installer.
-
-
 
 ## Screenshots
 
@@ -80,16 +79,15 @@ Explore CyberClip's terminal interface and features through the screenshots belo
 
 *Screenshots are hosted separately in [Picture_Vault](https://github.com/spoilpetal/Picture_Vault/tree/main/CyberClip_pictures/v0.1.0) to keep the CyberClip source repository lightweight.*
 
-
 ## Platform support and testing status
 
-| Platform | Clipboard implementation |  hands-on runtime testing |
+| Platform | Clipboard implementation | Hands-on runtime testing |
 |---|---|---|
 | Linux + Wayland | Native Wayland protocol backend (`wl-clipboard-rs`) | **Tested** |
 | Linux + X11 | `clipboard-rs` X11 backend | Implemented; needs independent X11 runtime verification |
-| Windows x86_64 | Native Win32 backend through `clipboard-rs` | Not tested by me; needs Windows CI and real-device verification |
-| macOS Intel | Native macOS pasteboard backend through `clipboard-rs` | Not tested by me; needs macOS CI and real-device verification |
-| macOS Apple Silicon | Native macOS pasteboard backend through `clipboard-rs` | Not tested by me; needs macOS CI and real-device verification |
+| Windows x86_64 | Native Win32 backend through `clipboard-rs` | Not tested; needs Windows CI and real-device verification |
+| macOS Intel | Native macOS pasteboard backend through `clipboard-rs` | Not tested; needs macOS CI and real-device verification |
+| macOS Apple Silicon | Native macOS pasteboard backend through `clipboard-rs` | Not tested; needs macOS CI and real-device verification |
 | FreeBSD / OpenBSD / NetBSD | No supported backend currently enabled | **Not supported** |
 
 The project includes GitHub Actions workflows intended to check and build Linux, Windows, and macOS targets on native runners. A successful cross-platform build confirms compilation for that target; it does **not** prove that every clipboard operation behaves correctly on every desktop, window manager, compositor, or OS version. Reports and testing from Windows and macOS users are welcome.
@@ -116,9 +114,7 @@ CyberClip uses native Rust clipboard libraries. It does not require the external
 
 ## Install from source
 
-
-
-### Linux — wayland user (recommended)
+### Linux — current user (recommended)
 
 ```bash
 # Replace the filename with the package you downloaded.
@@ -132,8 +128,8 @@ The installer builds the release binary and asks which command name(s) to instal
 
 1. `cyberclip` only
 2. `cpl` only
-3. both names
-4. cancel
+3. Both names
+4. Cancel
 
 The default installation is under `~/.local/bin`. It does not require `sudo`. If the installer adds this directory to your shell's `PATH`, open a new terminal or reload your shell configuration.
 
@@ -207,7 +203,7 @@ The source includes a macOS clipboard backend. A source build/install must be ru
 ./install.sh
 ```
 
-Build from source on a Mac is recommended. macOS runtime behavior has not been hands-on tested by the me yet.
+Building from source on a Mac is recommended. macOS runtime behavior has not been hands-on tested yet.
 
 ## Build manually
 
@@ -224,7 +220,7 @@ cargo build --locked --release
 The release executable is written to:
 
 - Linux/macOS: `target/release/cyberclip`
-- Windows: `target\release\cyberclip.exe`
+- Windows: `target/release/cyberclip.exe`
 
 Run the program directly without installing it:
 
@@ -439,6 +435,62 @@ cpl get --no-numbers line 5:20 README.md
 
 The `get` command is intended for text files. If no content matches, the clipboard is left unchanged.
 
+### `get all` — run a command and copy its output
+
+`get all --` runs a shell command, displays its output live in the terminal, copies the command and its complete output to the system clipboard, and records the capture in CyberClip history.
+
+**Basic usage:**
+
+```bash
+cpl get all -- 'printf "Hello from CyberClip\n"'
+```
+
+**Shell operators:**
+
+Pipes, `&&`, semicolons, and other shell features are supported.
+
+```bash
+cpl get all -- 'uname -a; printf "Finished\n"'
+cpl get all -- 'ls -la | grep "^d"'
+cpl get all -- 'mkdir -p /tmp/cyberclip-test && echo "Directory created successfully"'
+```
+
+**Using both single and double quotes:**
+
+The shell parses quotes before CyberClip receives the command. Choose the outer quoting style that keeps the inner quotes intact.
+
+```bash
+cpl get all -- "printf '%s\n' \"DOUBLE QUOTES\"; printf '%s\n' 'SINGLE QUOTES'"
+```
+
+The outer quotes are only used to pass the command through your shell; they are not included in the captured command.
+
+**What gets captured:**
+
+- The command itself.
+- Standard output (stdout) and standard error (stderr), merged through one shared pipe.
+- Live merged output displayed in the terminal.
+- The complete capture copied to the system clipboard and saved in CyberClip history.
+
+Because stdout and stderr share one pipe, CyberClip avoids the ordering race caused by reading the two streams on separate threads. Captured order follows the order in which writes reach the pipe; buffering inside individual programs can still affect when output is written.
+
+**Troubleshooting and quoting:**
+
+- Always include the `--` separator after `get all`.
+- Quote the entire command so your interactive shell does not interpret operators such as `&&`, `|`, or `;` before CyberClip receives them.
+- Prefer single quotes around the complete command and double quotes inside it. If you use outer double quotes, escape inner double quotes and remember that your shell may expand variables or process substitutions.
+- If a command contains a literal single quote, choose an appropriate escaping strategy rather than blindly wrapping it in single quotes.
+
+Example:
+
+```bash
+cpl get all -- 'cd /path/to/project && printf "Build started\n"; printf "Diagnostic message\n" >&2; printf "Build finished\n"'
+```
+
+The `--` separator is required. Everything after it is treated as the command to execute.
+
+If the executed command returns a nonzero exit status, CyberClip still captures its output and reports that status. CyberClip itself currently returns success if the capture and clipboard operations complete successfully.
+
 ## TUI controls
 
 Open the interface:
@@ -576,13 +628,14 @@ File and image history stores source paths. If the original file was moved, rena
 ### Windows or macOS issue
 
 Please include:
+
 - OS version and architecture.
 - CyberClip version (`cyberclip --version` or `cpl --version`).
 - Exact command or TUI action.
 - Full error output.
 - Whether the failure occurs in a native terminal session or remote/virtualized session.
 
-Because i don't currently have Windows/macOS machines, detailed reports and independent testing are especially valuable.
+Detailed reports and independent testing are especially valuable.
 
 ## Contributing
 
@@ -598,8 +651,6 @@ cargo test --locked
 cargo build --locked --release
 ```
 
-
-
 When opening an issue, include reproducible steps, expected behavior, actual behavior, OS/session details, and relevant logs. Please avoid including private clipboard contents, tokens, passwords, or other sensitive data in issue reports.
 
 For platform contributions, please state whether you tested on a real machine, a VM, or CI. In particular, Windows and macOS runtime testing is needed to confirm the native clipboard backends.
@@ -614,8 +665,8 @@ The repository contains GitHub Actions workflows:
 To publish a release after pushing the repository:
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.2.0
+git push origin v0.2.0
 ```
 
 The release workflow is configured for these targets:
@@ -628,25 +679,22 @@ The release workflow is configured for these targets:
 
 Check the GitHub Actions run and the resulting Release page before announcing that a platform asset is available. A configured workflow is not the same thing as a completed, successful build. The source installers currently build from source; the platform release archives are downloaded separately from GitHub Releases.
 
+## Good to know
 
-## Good to know ::
-There is a lite version of this CyberClip available here <a href="https://github.com/spoilpetal/CyberClip_lite" target="_new">CyberClip_lite</a> 
-
+There is a lite version of CyberClip available here: [CyberClip_lite](https://github.com/spoilpetal/CyberClip_lite).
 
 ## Known limitations
 
-- Windows and macOS source backends are implemented but have not been hands-on tested by the me. Independent native CI and real-device validation are still required.
-- Linux X11 is implemented but should receive independent runtime testing in addition on the  Wayland testing.
+- Windows and macOS source backends are implemented but have not been hands-on tested. Independent native CI and real-device validation are still required.
+- Linux X11 is implemented but should receive independent runtime testing in addition to Wayland testing.
 - BSD systems are not supported yet.
 - `paste` prints text only. It is not a binary export command for images or file selections.
 - Restoring file/image history depends on the original source path still existing.
 - ZIP archive browsing is read-only.
 - Clipboard operations require an active desktop clipboard session.
 
+## License and copyright
 
-## License and copyright 
-### Take good care of this project (but not permit to sell)
+### Take good care of this project (but do not permit resale)
 
-<br>
-
-this software comes with no warranty ! (cuz i had only test it only in Wayland linux and for other system i use rust native lib to function and source from the internet so i can't give guarantee of this software will work on system i mention !!!) 
+This software comes with no warranty. It has been tested on Linux Wayland, and other platforms use native Rust libraries but still need independent runtime verification. Use it at your own risk.

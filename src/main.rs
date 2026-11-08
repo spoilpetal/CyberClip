@@ -15,7 +15,10 @@ use std::{
     env,
     ffi::OsString,
     fs,
+    io::{Read, Write},
     path::{Path, PathBuf},
+    process::{Command, Stdio},
+    thread,
 };
 
 #[derive(Parser)]
@@ -39,10 +42,10 @@ enum Action {
     ClipboardServe { payload: PathBuf, mime: String, ready: PathBuf },
     Text { content: String },
     Get {
-       #[arg(required = true, num_args = 1..=3)]
-       args: Vec<String>,
-       #[arg(short = 'n')]
-       no_numbers: bool,
+        #[arg(required = true, num_args = 1..)]
+        args: Vec<String>,
+        #[arg(short = 'n')]
+        no_numbers: bool,
     },
     History {
         #[command(subcommand)]
@@ -427,6 +430,106 @@ fn normalized_args() -> Vec<OsString> {
     normalized
 }
 
+
+fn run_get_file_command(args: &[String], no_numbers: bool) -> Result<()> {
+    let show_numbers = !no_numbers;
+    let result = match args {
+        [file] => get::whole_file(Path::new(file))?,
+        [query, file] => get::search(Path::new(file), query, show_numbers)?,
+        [mode, range, file] if mode == "line" => {
+            let (start, end) = if let Some((start, end)) = range.split_once(':') {
+                (start.parse::<usize>()?, end.parse::<usize>()?)
+            } else {
+                let number = range.parse::<usize>()?;
+                (number, number)
+            };
+            get::extract(Path::new(file), start, end, show_numbers)?
+        }
+        _ => bail!("Usage: cyberclip get FILE | get QUERY FILE | get line RANGE FILE | get all -- COMMAND"),
+    };
+
+    if result.matches == 0 || result.text.is_empty() {
+        println!("No content found. Clipboard unchanged.");
+    } else {
+        clear_file_selection()?;
+        clipboard(result.text.as_bytes(), None)?;
+        add_history("text", result.text.clone())?;
+        print!("{}", result.text);
+        println!("\n{} line(s) copied to clipboard.", result.matches);
+    }
+    Ok(())
+}
+
+fn stream_and_capture<R: Read>(mut reader: R) -> Result<Vec<u8>> {
+    let mut captured = Vec::new();
+    let mut buffer = [0u8; 8192];
+    let mut terminal = std::io::stdout().lock();
+
+    loop {
+        let count = reader.read(&mut buffer)?;
+        if count == 0 {
+            break;
+        }
+
+        let chunk = &buffer[..count];
+        captured.extend_from_slice(chunk);
+        terminal.write_all(chunk)?;
+        terminal.flush()?;
+    }
+
+    Ok(captured)
+}
+
+fn run_command_and_copy(command: &str) -> Result<()> {
+    let (reader, writer) =
+        os_pipe::pipe().context("Could not create command output pipe")?;
+    let stderr_writer = writer
+        .try_clone()
+        .context("Could not clone command output pipe")?;
+
+    #[cfg(windows)]
+    let mut child = Command::new("cmd.exe")
+        .arg("/C")
+        .arg(command)
+        .stdin(Stdio::inherit())
+        .stdout(Stdio::from(writer))
+        .stderr(Stdio::from(stderr_writer))
+        .spawn()
+        .context("Could not start Windows command shell")?;
+
+    #[cfg(not(windows))]
+    let mut child = Command::new("sh")
+        .arg("-c")
+        .arg(command)
+        .stdin(Stdio::inherit())
+        .stdout(Stdio::from(writer))
+        .stderr(Stdio::from(stderr_writer))
+        .spawn()
+        .context("Could not start system shell")?;
+
+    let output_thread = thread::spawn(move || stream_and_capture(reader));
+
+    let status = child.wait().context("Could not wait for command to finish")?;
+    let output = output_thread
+        .join()
+        .map_err(|_| anyhow::anyhow!("The output capture thread failed"))??;
+
+    let mut complete_capture = format!("$ {command}\n").into_bytes();
+    complete_capture.extend_from_slice(&output);
+
+    clear_file_selection()?;
+    clipboard(&complete_capture, None)?;
+    let history_text = String::from_utf8_lossy(&complete_capture).into_owned();
+    add_history("text", history_text)?;
+    eprintln!("\nCyberClip: command and complete output copied to clipboard.");
+
+    if !status.success() {
+        eprintln!("CyberClip: command finished with status {status}.");
+    }
+
+    Ok(())
+}
+
 // `version` in the Clap attribute above comes directly from Cargo.toml, so
 // `cpl --version` stays in sync with the package version automatically.
 fn main() -> Result<()> {
@@ -444,30 +547,17 @@ fn main() -> Result<()> {
         Action::Storage => print!("{}", storage::report()),
         Action::Ui => tui::run()?,
         Action::Get { args, no_numbers } => {
-            let show_numbers = !no_numbers;
-            let result = match args.as_slice() {
-                [file] => get::whole_file(Path::new(file))?,
-                [query, file] => get::search(Path::new(file), query, show_numbers)?,
-                [mode, range, file] if mode == "line" => {
-                    let (start, end) = if let Some((start, end)) = range.split_once(':') {
-                        (start.parse::<usize>()?, end.parse::<usize>()?)
-                    } else {
-                        let number = range.parse::<usize>()?;
-                        (number, number)
-                    };
-                    get::extract(Path::new(file), start, end, show_numbers)?
+            if let [mode, command @ ..] = args.as_slice() {
+                if mode == "all" {
+                    if command.is_empty() {
+                        bail!("Usage: cyberclip get all -- COMMAND");
+                    }
+                    run_command_and_copy(&command.join(" "))?;
+                } else {
+                    run_get_file_command(&args, no_numbers)?;
                 }
-                _ => bail!("Usage: cyberclip get FILE | get QUERY FILE | get line RANGE FILE"),
-            };
-
-            if result.matches == 0 || result.text.is_empty() {
-                println!("No content found. Clipboard unchanged.");
             } else {
-                clear_file_selection()?;
-                clipboard(result.text.as_bytes(), None)?;
-                add_history("text", result.text.clone())?;
-                print!("{}", result.text);
-                println!("\n{} line(s) copied to clipboard.", result.matches);
+                run_get_file_command(&args, no_numbers)?;
             }
         }
         Action::Text { content } => {
