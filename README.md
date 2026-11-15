@@ -56,11 +56,11 @@ Explore CyberClip's terminal interface and features through the screenshots belo
 ![CyberClip Image Preview](https://raw.githubusercontent.com/spoilpetal/Picture_Vault/main/CyberClip_pictures/v0.1.0/image_preview.png)
 
 ### Archive Viewer
-
+- [Learn more](#known-limitations)
 ![CyberClip Archive Viewer](https://raw.githubusercontent.com/spoilpetal/Picture_Vault/main/CyberClip_pictures/v0.1.0/archive_view.png)
 
 ### File Information
-
+- [Learn more](#known-limitations)
 ![CyberClip File Information](https://raw.githubusercontent.com/spoilpetal/Picture_Vault/main/CyberClip_pictures/v0.1.0/file_information.png)
 
 ### TUI Storage Information
@@ -685,6 +685,8 @@ There is a lite version of CyberClip available here: [CyberClip_lite](https://gi
 - Restoring file/image history depends on the original source path still existing.
 - ZIP archive browsing is read-only.
 - Clipboard operations require an active desktop clipboard session.
+- Using `cpl files`every directory shows 4096 bytes
+- Only zip archive is previwble and no scrolling 
 
 ## License and copyright
 
